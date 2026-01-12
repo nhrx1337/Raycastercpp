@@ -62,6 +62,21 @@ void Raycaster::handleInput(const Uint8* state,
     if (state[SDL_SCANCODE_RIGHT]) rotate(-rotSpeed);
 }
 
+SDL_Color Raycaster::getWallColor(int wallType, int side) {
+    SDL_Color c;
+    switch(wallType) {
+        case 1:  c = {200, 0, 0, 255};   break; 
+        case 2:  c = {0, 200, 0, 255};   break; 
+        case 3:  c = {0, 0, 200, 255};   break; 
+        case 4:  c = {150, 150, 150, 255}; break;
+        case 5:  c = {200, 200, 0, 255};   break; 
+        default: c = {100, 100, 100, 255}; break;
+    }
+    // Simple shading: darken the color if it's a Y-side wall
+    if (side == 1) { c.r /= 1.5; c.g /= 1.5; c.b /= 1.5; } 
+    return c;
+}
+
 void Raycaster::render(SDL_Renderer* renderer, int w, int h) {
     screenWidth = w; screenHeight = h;
 
@@ -138,21 +153,6 @@ void Raycaster::render(SDL_Renderer* renderer, int w, int h) {
         SDL_RenderDrawLine(renderer, x, drawStart, x, drawEnd);
     }
     drawMinimap(renderer);
-}
-
-SDL_Color Raycaster::getWallColor(int wallType, int side) {
-    SDL_Color c;
-    switch(wallType) {
-        case 1:  c = {200, 0, 0, 255};   break; 
-        case 2:  c = {0, 200, 0, 255};   break; 
-        case 3:  c = {0, 0, 200, 255};   break; 
-        case 4:  c = {150, 150, 150, 255}; break;
-        case 5:  c = {200, 200, 0, 255};   break; 
-        default: c = {100, 100, 100, 255}; break;
-    }
-    // Simple shading: darken the color if it's a Y-side wall
-    if (side == 1) { c.r /= 1.5; c.g /= 1.5; c.b /= 1.5; } 
-    return c;
 }
 
 void Raycaster::drawMinimap(SDL_Renderer* renderer) {
