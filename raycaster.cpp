@@ -156,20 +156,36 @@ void Raycaster::render(SDL_Renderer* renderer, int w, int h) {
 }
 
 void Raycaster::drawMinimap(SDL_Renderer* renderer) {
-    int blockSize = 3; 
+    // Hide minimap if the window gets too tiny
+    if (screenWidth < 300 || screenHeight < 300) return;
+
+    // Scale minimap to 1/5 of the screen size
+    int minimapSize = std::min(screenWidth, screenHeight) / 5;
+    int blockSize = minimapSize / std::max(MAP_WIDTH, MAP_HEIGHT);
+    
+    // Safety check for tiny scales
+    if (blockSize < 1) return;
+
+    int margin = 10;
+    // Draw map blocks
     for (int x = 0; x < MAP_WIDTH; x++) {
         for (int y = 0; y < MAP_HEIGHT; y++) {
             if (worldMap[x][y] > 0) {
                 SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
-                SDL_Rect block = {y * blockSize + 10, 
-                    x * blockSize + 10, blockSize, blockSize};
+                SDL_Rect block = {y * blockSize + margin, 
+                    x * blockSize + margin, blockSize, blockSize};
                 SDL_RenderFillRect(renderer, &block);
             }
         }
     }
-    // Player indicator
+
+    // Draw player as a small dot scaled to block size
+    int pSize = std::max(2, blockSize / 2);
     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-    SDL_Rect p = {(int)(playerY * blockSize) + 9, 
-        (int)(playerX * blockSize) + 9, 3, 3};
+    SDL_Rect p = {
+        (int)(playerY * blockSize) + margin + (blockSize/2 - pSize/2),
+        (int)(playerX * blockSize) + margin + (blockSize/2 - pSize/2),
+        pSize, pSize
+    };
     SDL_RenderFillRect(renderer, &p);
 }
